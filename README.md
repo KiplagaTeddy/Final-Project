@@ -78,3 +78,5 @@ The project uses an SQLite database with three main tables:
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
+
+## Project by:TEDDY KIPLAGAT
