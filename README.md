@@ -1,172 +1,80 @@
-# Phase 3 CLI+ORM Project Template
-
-## Learning Goals
-
-- Discuss the basic directory structure of a CLI.
-- Outline the first steps in building a CLI.
-
----
+# Final Project
 
 ## Introduction
+This project is a Command Line Interface (CLI) application for managing inventory items, categories, and suppliers. It allows users to list, find, create, update, and delete records in an SQLite database.
 
-You now have a basic idea of what constitutes a CLI. Fork and clone this lesson
-for a project template for your CLI.
+## Features
+- **Manage Items**: Add, update, delete, list, and find items by name or ID.
+- **Manage Categories**: Add, delete, and list categories.
+- **Manage Suppliers**: Add, update, delete, and list suppliers with contact and address details.
+- **Filter Items**: Filter items by category or supplier.
 
-Take a look at the directory structure:
+## Usage
+1. **Run the CLI:**
+    ```sh
+    python lib/cli.py
+    ```
 
-```console
-.
-├── Pipfile
-├── Pipfile.lock
-├── README.md
-└── lib
-    ├── models
-    │   ├── __init__.py
-    │   └── model_1.py
-    ├── cli.py
-    ├── debug.py
-    └── helpers.py
-```
+2. **Navigate through the menu options:**
+    - **Items Menu**
+        1. List Items
+        2. Find Item by Name
+        3. Find Item by ID
+        4. Add Item
+        5. Update Item
+        6. Delete Item
+        7. Filter Items by Category or Supplier
+        8. Back to Main Menu
+    - **Categories Menu**
+        1. List Categories
+        2. Add Category
+        3. Delete Category
+        4. Back to Main Menu
+    - **Suppliers Menu**
+        1. List Suppliers
+        2. Add Supplier
+        3. Update Supplier
+        4. Delete Supplier
+        5. Back to Main Menu
+    - **Exit Program**
 
-Note: The directory also includes two files named `CONTRIBUTING.md` and
-`LICENSE.md` that are specific to Flatiron's curriculum. You can disregard or
-delete the files if you want.
+## Database Schema
+The project uses an SQLite database with three main tables:
+- **Items**: Stores item details like name, quantity, price, category_id, and supplier_id.
+- **Categories**: Stores category details like name and description.
+- **Suppliers**: Stores supplier details including name, contact, and address.
 
----
+## Classes and Methods
+### Supplier
+- **Attributes**: `id`, `name`, `contact`, `address`
+- **Methods**:
+    - `create_table()`, `drop_table()`, `save()`, `create()`, `get_all()`, `find_by_id()`, `find_by_name()`, `update()`, `delete()`, `instance_from_db()`
 
-## Generating Your Environment
+### Item
+- **Attributes**: `id`, `name`, `quantity`, `price`, `category_id`, `supplier_id`
+- **Methods**:
+    - Similar to `Supplier` with item-specific operations
 
-You might have noticed in the file structure- there's already a Pipfile!
+### Category
+- **Attributes**: `id`, `name`, `description`
+- **Methods**:
+    - Similar to `Supplier` with category-specific operations
 
-Install any additional dependencies you know you'll need for your project by
-adding them to the `Pipfile`. Then run the commands:
+## Contributing
+1. **Fork the repository**
+2. **Create a feature branch:**
+    ```sh
+    git checkout -b feature/your-feature
+    ```
+3. **Commit your changes:**
+    ```sh
+    git commit -m 'Add some feature'
+    ```
+4. **Push to the branch:**
+    ```sh
+    git push origin feature/your-feature
+    ```
+5. **Open a pull request**
 
-```console
-pipenv install
-pipenv shell
-```
-
----
-
-## Generating Your CLI
-
-A CLI is, simply put, an interactive script and prompts the user and performs
-operations based on user input.
-
-The project template has a sample CLI in `lib/cli.py` that looks like this:
-
-```py
-# lib/cli.py
-
-from helpers import (
-    exit_program,
-    helper_1
-)
-
-
-def main():
-    while True:
-        menu()
-        choice = input("> ")
-        if choice == "0":
-            exit_program()
-        elif choice == "1":
-            helper_1()
-        else:
-            print("Invalid choice")
-
-
-def menu():
-    print("Please select an option:")
-    print("0. Exit the program")
-    print("1. Some useful function")
-
-
-if __name__ == "__main__":
-    main()
-```
-
-The helper functions are located in `lib/helpers.py`:
-
-```py
-# lib/helpers.py
-
-def helper_1():
-    print("Performing useful function#1.")
-
-
-def exit_program():
-    print("Goodbye!")
-    exit()
-```
-
-You can run the template CLI with `python lib/cli.py`, or include the shebang
-and make it executable with `chmod +x`. The template CLI will ask for input, do
-some work, and accomplish some sort of task.
-
-Past that, CLIs can be whatever you'd like, as long as you follow the project
-requirements.
-
-Of course, you will update `lib/cli.py` with prompts that are appropriate for
-your application, and you will update `lib/helpers.py` to replace `helper_1()`
-with a useful function based on the specific problem domain you decide to
-implement, along with adding other helper functions to the module.
-
-In the `lib/models` folder, you should rename `model_1.py` with the name of a
-data model class from your specific problem domain, and add other classes to the
-folder as needed. The file `lib/models/__init__.py` has been initialized to
-create the necessary database constants. You need to add import statements to
-the various data model classes in order to use the database constants.
-
-You are also welcome to implement a different module and directory structure.
-However, your project should be well organized, modular, and follow the design
-principal of separation of concerns, which means you should separate code
-related to:
-
-- User interface
-- Data persistence
-- Problem domain rules and logic
-
----
-
-## Updating README.md
-
-`README.md` is a Markdown file that should describe your project. You will
-replace the contents of this `README.md` file with a description of **your**
-actual project.
-
-Markdown is not a language that we cover in Flatiron's Software Engineering
-curriculum, but it's not a particularly difficult language to learn (if you've
-ever left a comment on Reddit, you might already know the basics). Refer to the
-cheat sheet in this assignments's resources for a basic guide to Markdown.
-
-### What Goes into a README?
-
-This README serves as a template. Replace the contents of this file to describe
-the important files in your project and describe what they do. Each Python file
-that you edit should get at least a paragraph, and each function should be
-described with a sentence or two.
-
-Describe your actual CLI script first, and with a good level of detail. The rest
-should be ordered by importance to the user. (Probably functions next, then
-models.)
-
-Screenshots and links to resources that you used throughout are also useful to
-users and collaborators, but a little more syntactically complicated. Only add
-these in if you're feeling comfortable with Markdown.
-
----
-
-## Conclusion
-
-A lot of work goes into a good CLI, but it all relies on concepts that you've
-practiced quite a bit by now. Hopefully this template and guide will get you off
-to a good start with your Phase 3 Project.
-
-Happy coding!
-
----
-
-## Resources
-
-- [Markdown Cheat Sheet](https://www.markdownguide.org/cheat-sheet/)
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
