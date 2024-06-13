@@ -58,7 +58,7 @@ def update_item():
             item.update()
             print(f'Success: {item}')
         except Exception as exc:
-            print("Error updating item: ", exc)
+            print("Oops! Error updating item: ", exc)
     else:
         print(f'Item {id_} not found')
 
