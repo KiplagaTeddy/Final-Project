@@ -3,14 +3,14 @@ from models.__init__ import CURSOR, CONN
 class Supplier:
     all = {}
 
-    def __init__(self, name, address, phone, id=None):
+    def __init__(self, name, contact=None, address=None, id=None):
         self.id = id
         self.name = name
+        self.contact = contact
         self.address = address
-        self.phone = phone
 
     def __repr__(self):
-        return f"<Supplier {self.id}: {self.name}, {self.address}, {self.phone}>"
+        return f"<Supplier {self.id}: {self.name}>"
 
     @property
     def name(self):
@@ -24,36 +24,30 @@ class Supplier:
             raise ValueError("Name must be a non-empty string")
 
     @property
+    def contact(self):
+        return self._contact
+
+    @contact.setter
+    def contact(self, contact):
+        self._contact = contact
+
+    @property
     def address(self):
         return self._address
 
     @address.setter
     def address(self, address):
-        if isinstance(address, str) and len(address):
-            self._address = address
-        else:
-            raise ValueError("Address must be a non-empty string")
-
-    @property
-    def phone(self):
-        return self._phone
-
-    @phone.setter
-    def phone(self, phone):
-        if isinstance(phone, str) and len(phone):
-            self._phone = phone
-        else:
-            raise ValueError("Phone must be a non-empty string")
+        self._address = address
 
     @classmethod
     def create_table(cls):
         sql = """
             CREATE TABLE IF NOT EXISTS suppliers (
-                id INTEGER PRIMARY KEY,
-                name TEXT,
-                address TEXT,
-                phone TEXT
-            )
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            contact TEXT,
+            address TEXT
+        )
         """
         CURSOR.execute(sql)
         CONN.commit()
@@ -65,15 +59,18 @@ class Supplier:
         CONN.commit()
 
     def save(self):
-        sql = "INSERT INTO suppliers (name, address, phone) VALUES (?, ?, ?)"
-        CURSOR.execute(sql, (self.name, self.address, self.phone))
-        CONN.commit()
-        self.id = CURSOR.lastrowid
-        type(self).all[self.id] = self
+        if self.id:
+            self.update()
+        else:
+            sql = "INSERT INTO suppliers (name, contact, address) VALUES (?, ?, ?)"
+            CURSOR.execute(sql, (self.name, self.contact, self.address))
+            CONN.commit()
+            self.id = CURSOR.lastrowid
+            type(self).all[self.id] = self
 
     @classmethod
-    def create(cls, name, address, phone):
-        supplier = cls(name, address, phone)
+    def create(cls, name, contact, address):
+        supplier = cls(name, contact, address)
         supplier.save()
         return supplier
 
@@ -95,21 +92,27 @@ class Supplier:
         row = CURSOR.execute(sql, (name,)).fetchone()
         return cls.instance_from_db(row) if row else None
 
+    def update(self):
+        sql = "UPDATE suppliers SET name = ?, contact = ?, address = ? WHERE id = ?"
+        CURSOR.execute(sql, (self.name, self.contact, self.address, self.id))
+        CONN.commit()
+
+    @classmethod
+    def delete(cls, id):
+        sql = "DELETE FROM suppliers WHERE id = ?"
+        CURSOR.execute(sql, (id,))
+        CONN.commit()
+        del cls.all[id]
+
     @classmethod
     def instance_from_db(cls, row):
         supplier = cls.all.get(row[0])
         if supplier:
             supplier.name = row[1]
-            supplier.address = row[2]
-            supplier.phone = row[3]
+            supplier.contact = row[2]
+            supplier.address = row[3]
         else:
             supplier = cls(row[1], row[2], row[3])
             supplier.id = row[0]
             cls.all[supplier.id] = supplier
         return supplier
-
-    def items(self):
-        from models.item import Item
-        sql = "SELECT * FROM items WHERE supplier_id = ?"
-        rows = CURSOR.execute(sql, (self.id,)).fetchall()
-        return [Item.instance_from_db(row) for row in rows]

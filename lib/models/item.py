@@ -2,7 +2,6 @@ from models.__init__ import CURSOR, CONN
 from models.category import Category
 from models.supplier import Supplier
 
-
 class Item:
     all = {}
 
@@ -15,7 +14,7 @@ class Item:
         self.supplier_id = supplier_id
 
     def __repr__(self):
-        return f"<Item {self.id}: {self.name}, Quantity: {self.quantity}, Price: {self.price}, Category ID: {self.category_id}, Supplier ID: {self.supplier_id}>"
+        return f"{self.id}: {self.name}, Quantity: {self.quantity}, Price: {self.price}, Category ID: {self.category_id}, Supplier ID: {self.supplier_id}"
 
     @property
     def name(self):
@@ -110,6 +109,25 @@ class Item:
         item = cls(name, quantity, price, category_id, supplier_id)
         item.save()
         return item
+    
+    @classmethod
+    def instance_from_db(cls, row):
+        item = cls.all.get(row[0])
+        if item:
+            item.name = row[1]
+            item.quantity = row[2]
+            item.price = row[3]
+            item.category_id = row[4]
+            item.supplier_id = row[5]
+        else:
+            try:
+                item = cls(row[1], row[2], row[3], row[4], row[5])
+                item.id = row[0]
+                cls.all[item.id] = item
+            except ValueError as e:
+                print(f"Warning: {e} - Skipping item with ID {row[0]}")
+            return None
+        return item
 
     @classmethod
     def get_all(cls):
@@ -141,7 +159,6 @@ class Item:
         rows = CURSOR.execute(sql, (supplier_id,)).fetchall()
         return [cls.instance_from_db(row) for row in rows]
 
-    
     def update(self):
         sql = """
         UPDATE items
@@ -150,7 +167,6 @@ class Item:
         """
         CURSOR.execute(sql, (self.name, self.quantity, self.price, self.category_id, self.supplier_id, self.id))
         CONN.commit()
-
 
     @classmethod
     def delete(cls, id):
@@ -163,28 +179,10 @@ class Item:
         if id in cls.all:
             del cls.all[id]
 
-
-
-
-    @classmethod
-    def instance_from_db(cls, row):
-        item = cls.all.get(row[0])
-        if item:
-            item.name = row[1]
-            item.quantity = row[2]
-            item.price = row[3]
-            item.category_id = row[4]
-            item.supplier_id = row[5]
-        else:
-            item = cls(row[1], row[2], row[3], row[4], row[5])
-            item.id = row[0]
-            cls.all[item.id] = item
-        return item
-
+    @property
     def category(self):
-        from models.category import Category
         return Category.find_by_id(self.category_id)
 
+    @property
     def supplier(self):
-        from models.supplier import Supplier
         return Supplier.find_by_id(self.supplier_id)

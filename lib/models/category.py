@@ -81,6 +81,13 @@ class Category:
         sql = "SELECT * FROM categories WHERE name = ?"
         row = CURSOR.execute(sql, (name,)).fetchone()
         return cls.instance_from_db(row) if row else None
+    
+    @classmethod
+    def delete(cls, id_):
+        sql = "DELETE FROM categories WHERE id = ?"
+        CURSOR.execute(sql, (id_,))
+        CONN.commit()
+        cls.all.pop(id_, None)
 
     @classmethod
     def instance_from_db(cls, row):
